@@ -10,8 +10,23 @@ pub(crate) struct NpmRegistry {
     pub(crate) url: String,
     pub(crate) in_use: bool,
     pub(crate) home: Option<String>,
-    // TODO: store all including url and home.
     pub(crate) kvs: Option<Vec<(String, String)>>,
+}
+
+impl Into<NPMRC> for NpmRegistry {
+    fn into(self) -> NPMRC {
+        let Self { url, home, kvs, .. } = self;
+        let mut npmrc: NPMRC = vec![(NPMRC_URL.to_string(), url)];
+        if let Some(home) = home {
+            npmrc.push((NPMRC_HOME.to_string(), home));
+        }
+
+        if let Some(mut kvs) = kvs {
+            npmrc.append(&mut kvs);
+        }
+
+        npmrc
+    }
 }
 
 impl NpmRegistry {
