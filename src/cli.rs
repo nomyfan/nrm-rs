@@ -23,4 +23,7 @@ pub(crate) enum Command {
     Delete {
         name: String,
     },
+    Use {
+        name: String,
+    },
 }

@@ -1,12 +1,16 @@
 pub(crate) const NPMRC_HOME: &str = "home";
 pub(crate) const NPMRC_URL: &str = "registry";
 
+pub(crate) type KV = (String, String);
+pub(crate) type NPMRC = Vec<KV>;
+
 #[derive(Debug, Clone)]
 pub(crate) struct NpmRegistry {
     pub(crate) name: String,
     pub(crate) url: String,
     pub(crate) in_use: bool,
     pub(crate) home: Option<String>,
+    // TODO: store all including url and home.
     pub(crate) kvs: Option<Vec<(String, String)>>,
 }
 

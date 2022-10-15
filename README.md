@@ -4,7 +4,7 @@ Commands under TODO
 
 - [x] list
 - [x] current
-- [ ] use
+- [x] use
 - [x] add
 - [ ] set
 - [x] rename

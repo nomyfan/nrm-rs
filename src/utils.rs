@@ -1,5 +1,6 @@
-use crate::config::{get_preset_registries, NpmRegistry};
+use crate::config::{get_preset_registries, NpmRegistry, NPMRC};
 use crate::config::{NPMRC_HOME, NPMRC_URL};
+use anyhow::{bail, Result};
 
 pub(crate) fn npmrc_path() -> std::path::PathBuf {
     let home_dir = dirs::home_dir().unwrap();
@@ -13,17 +14,38 @@ pub(crate) fn nrmrc_path() -> std::path::PathBuf {
     home_dir.join(".nrmrc")
 }
 
-// pub(crate) fn read_npmrc() -> NpmRegistry {
-//     todo!()
-// }
+pub(crate) fn read_npmrc() -> Result<Option<NPMRC>> {
+    match ini::Ini::load_from_file(npmrc_path()) {
+        Ok(npmrc_ini) => {
+            let props = npmrc_ini.general_section();
+            let kvs = props
+                .iter()
+                .map(|(k, v)| (k.to_string(), v.to_string()))
+                .collect::<Vec<(String, String)>>();
 
-// pub(crate) fn write_npmrc(registry: NpmRegistry) {
-//     todo!()
-// }
+            Ok(Some(kvs))
+        }
+        Err(ini::Error::Io(err)) if err.kind() == std::io::ErrorKind::NotFound => Ok(None),
+        Err(err) => {
+            bail!(err)
+        }
+    }
+}
+
+pub(crate) fn write_npmrc(npmrc: NPMRC) {
+    let mut npmrc_ini = ini::Ini::new();
+    let mut section = &mut npmrc_ini.with_general_section();
+
+    for (k, v) in npmrc.into_iter() {
+        section = section.set(k, v);
+    }
+
+    npmrc_ini.write_to_file(npmrc_path()).unwrap();
+}
 
 pub(crate) fn read_nrmrc() -> Vec<NpmRegistry> {
     let mut registries = vec![];
-    let nrmrc = ini::Ini::load_from_file(nrmrc_path()).unwrap();
+    let nrmrc = ini::Ini::load_from_file(nrmrc_path()).unwrap(); // TODO Handle the case where the file is not created yet.
 
     for (name, props) in &nrmrc {
         let mut kvs: Vec<(String, String)> = vec![];
