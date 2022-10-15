@@ -1,5 +1,5 @@
-pub(crate) const KEY_HOME: &str = "home";
-pub(crate) const KEY_REGISTRY: &str = "registry";
+pub(crate) const NPMRC_HOME: &str = "home";
+pub(crate) const NPMRC_URL: &str = "registry";
 
 #[derive(Debug, Clone)]
 pub(crate) struct NpmRegistry {

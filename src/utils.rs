@@ -1,5 +1,5 @@
 use crate::config::{get_preset_registries, NpmRegistry};
-use crate::config::{KEY_HOME, KEY_REGISTRY};
+use crate::config::{NPMRC_HOME, NPMRC_URL};
 
 pub(crate) fn npmrc_path() -> std::path::PathBuf {
     let home_dir = dirs::home_dir().unwrap();
@@ -35,8 +35,8 @@ pub(crate) fn read_nrmrc() -> Vec<NpmRegistry> {
         }
         let mut registry = NpmRegistry::new(
             name.unwrap(),
-            props.get(KEY_REGISTRY).unwrap(),
-            props.get(KEY_HOME),
+            props.get(NPMRC_URL).unwrap(),
+            props.get(NPMRC_HOME),
         );
         registry.kvs = Some(kvs);
         registries.push(registry);
@@ -50,14 +50,14 @@ pub(crate) fn write_nrmrc(registries: &Vec<NpmRegistry>) {
     for registry in registries.iter() {
         let name = &registry.name[..];
         let mut section = nrmrc_ini.with_section(Some(name));
-        let mut section_setter = section.set(KEY_REGISTRY, &registry.url[..]);
+        let mut section = section.set(NPMRC_URL, &registry.url[..]);
         if let Some(home) = &registry.home {
-            section_setter = section_setter.set(KEY_HOME, &home[..]);
+            section = section.set(NPMRC_HOME, &home[..]);
         }
 
         if registry.kvs.is_some() {
             for (k, v) in registry.kvs.as_ref().unwrap().iter() {
-                section_setter = section_setter.set(&k[..], &v[..]);
+                section = section.set(&k[..], &v[..]);
             }
         }
     }
@@ -69,7 +69,7 @@ pub(crate) fn set_in_use(mut registries: Vec<NpmRegistry>) -> Vec<NpmRegistry> {
     let mut set = false;
     if let Ok(npmrc) = ini::Ini::load_from_file(npmrc_path()) {
         if let Some(global_section) = npmrc.section(None::<String>) {
-            if let Some(registry) = global_section.get(KEY_REGISTRY) {
+            if let Some(registry) = global_section.get(NPMRC_URL) {
                 if let Some(target) = registries.iter_mut().find(|x| &x.url == registry) {
                     target.in_use = true;
                     set = true;
