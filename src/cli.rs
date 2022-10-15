@@ -1,0 +1,13 @@
+use clap::{Parser, Subcommand};
+
+#[derive(Parser, Debug)]
+#[clap(author)]
+pub(crate) struct Cli {
+    #[clap(subcommand)]
+    pub(crate) command: Command,
+}
+
+#[derive(Subcommand, Debug)]
+pub(crate) enum Command {
+    List,
+}
