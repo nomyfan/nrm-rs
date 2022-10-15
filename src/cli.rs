@@ -10,4 +10,5 @@ pub(crate) struct Cli {
 #[derive(Subcommand, Debug)]
 pub(crate) enum Command {
     List,
+    Current,
 }
