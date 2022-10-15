@@ -1,4 +1,4 @@
-use crate::config::{get_preset_registries, NpmRegistry, NPMRC};
+use crate::config::{get_preset_registries, NpmRegistry, KV, NPMRC};
 use crate::config::{NPMRC_HOME, NPMRC_URL};
 use anyhow::{bail, Result};
 
@@ -48,13 +48,11 @@ pub(crate) fn read_nrmrc() -> Vec<NpmRegistry> {
     let nrmrc = ini::Ini::load_from_file(nrmrc_path()).unwrap(); // TODO Handle the case where the file is not created yet.
 
     for (name, props) in &nrmrc {
-        let mut kvs: Vec<(String, String)> = vec![];
-        for (k, v) in props
+        let kvs = props
             .iter()
-            .filter(|(k, _)| k != &"registry" && k != &"home")
-        {
-            kvs.push((k.to_string(), v.to_string()));
-        }
+            .filter(|(k, _)| &k[..] != NPMRC_URL && &k[..] != NPMRC_HOME)
+            .map(|(k, v)| (k.to_string(), v.to_string()))
+            .collect::<Vec<KV>>();
         let mut registry = NpmRegistry::new(
             name.unwrap(),
             props.get(NPMRC_URL).unwrap(),
