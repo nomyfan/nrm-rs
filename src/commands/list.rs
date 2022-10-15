@@ -10,7 +10,7 @@ pub(crate) fn cmd_list() {
             "{0}{1:-<width$}{2}",
             if r.in_use { "* " } else { "  " },
             &r.name,
-            &r.registry
+            &r.url
         );
     }
 }

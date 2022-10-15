@@ -4,7 +4,7 @@ mod config;
 mod utils;
 
 use cli::{Cli, Command};
-use commands::{current, list};
+use commands::{add, current, list};
 
 fn main() {
     use clap::Parser;
@@ -15,6 +15,13 @@ fn main() {
         }
         Command::Current => {
             current();
+        }
+        Command::Add {
+            name,
+            url: registry,
+            home,
+        } => {
+            add(name, registry, home);
         }
     }
 }

@@ -11,4 +11,9 @@ pub(crate) struct Cli {
 pub(crate) enum Command {
     List,
     Current,
+    Add {
+        name: String,
+        url: String,
+        home: Option<String>,
+    },
 }

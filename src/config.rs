@@ -4,21 +4,23 @@ pub(crate) const KEY_REGISTRY: &str = "registry";
 #[derive(Debug, Clone)]
 pub(crate) struct NpmRegistry {
     pub(crate) name: String,
-    pub(crate) registry: String,
+    pub(crate) url: String,
     pub(crate) in_use: bool,
     pub(crate) home: Option<String>,
+    pub(crate) kvs: Option<Vec<(String, String)>>,
 }
 
 impl NpmRegistry {
-    pub(crate) fn new<S>(name: S, registry: S, home: Option<S>) -> Self
+    pub(crate) fn new<S>(name: S, url: S, home: Option<S>) -> Self
     where
         S: AsRef<str>,
     {
         NpmRegistry {
             name: name.as_ref().into(),
             in_use: false,
-            registry: registry.as_ref().into(),
+            url: url.as_ref().into(),
             home: home.map(|s| s.as_ref().into()),
+            kvs: None,
         }
     }
 }
