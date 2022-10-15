@@ -1,8 +1,9 @@
 # nrm-rs
 
 Commands under TODO
-- [ ] list 
-- [ ] current
+
+- [x] list
+- [x] current
 - [ ] use
 - [ ] add
 - [ ] set
@@ -11,6 +12,7 @@ Commands under TODO
 - [ ] home
 
 Commands under consideration
+
 - [ ] login
 - [ ] set-hosted-repo
 - [ ] set-scope
