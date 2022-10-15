@@ -1,4 +1,4 @@
-use crate::config::{get_embed_registries, NpmRegistry};
+use crate::config::{get_preset_registries, NpmRegistry};
 use crate::config::{KEY_HOME, KEY_REGISTRY};
 
 pub(crate) fn npmrc_path() -> std::path::PathBuf {
@@ -89,7 +89,7 @@ pub(crate) fn set_in_use(mut registries: Vec<NpmRegistry>) -> Vec<NpmRegistry> {
 
 pub(crate) fn get_all_registries() -> Vec<NpmRegistry> {
     let nrmrc = read_nrmrc();
-    let embed_registries = get_embed_registries()
+    let embed_registries = get_preset_registries()
         .into_iter()
         .filter(|x| !nrmrc.iter().any(|y| y.name == x.name || y.url == x.url))
         .collect();

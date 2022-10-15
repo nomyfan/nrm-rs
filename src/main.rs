@@ -4,7 +4,7 @@ mod config;
 mod utils;
 
 use cli::{Cli, Command};
-use commands::{add, current, list, rename};
+use commands::{add, current, delete, list, rename};
 
 fn main() {
     use clap::Parser;
@@ -25,6 +25,9 @@ fn main() {
         }
         Command::Rename { name, new_name } => {
             rename(name, new_name);
+        }
+        Command::Delete { name } => {
+            delete(name);
         }
     }
 }

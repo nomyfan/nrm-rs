@@ -20,4 +20,7 @@ pub(crate) enum Command {
         name: String,
         new_name: String,
     },
+    Delete {
+        name: String,
+    },
 }

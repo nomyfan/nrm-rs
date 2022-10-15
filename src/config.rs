@@ -25,7 +25,7 @@ impl NpmRegistry {
     }
 }
 
-pub(crate) fn get_embed_registries() -> Vec<NpmRegistry> {
+pub(crate) fn get_preset_registries() -> Vec<NpmRegistry> {
     vec![
         NpmRegistry::new(
             "npm",

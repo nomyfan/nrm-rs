@@ -8,7 +8,7 @@ Commands under TODO
 - [x] add
 - [ ] set
 - [x] rename
-- [ ] del
+- [x] delete
 - [ ] home
 
 Commands under consideration
