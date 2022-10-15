@@ -4,7 +4,7 @@ mod config;
 mod utils;
 
 use cli::{Cli, Command};
-use commands::{add, current, list};
+use commands::{add, current, list, rename};
 
 fn main() {
     use clap::Parser;
@@ -22,6 +22,9 @@ fn main() {
             home,
         } => {
             add(name, registry, home);
+        }
+        Command::Rename { name, new_name } => {
+            rename(name, new_name);
         }
     }
 }

@@ -7,7 +7,7 @@ Commands under TODO
 - [ ] use
 - [x] add
 - [ ] set
-- [ ] rename
+- [x] rename
 - [ ] del
 - [ ] home
 

@@ -16,4 +16,8 @@ pub(crate) enum Command {
         url: String,
         home: Option<String>,
     },
+    Rename {
+        name: String,
+        new_name: String,
+    },
 }
