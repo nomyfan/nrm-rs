@@ -29,7 +29,7 @@ pub(crate) enum Command {
         name: String,
     },
     Home {
-        name: String,
+        name: Option<String>,
         browser: Option<String>,
     },
 }

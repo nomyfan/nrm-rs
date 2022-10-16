@@ -16,19 +16,31 @@ pub(crate) fn nrmrc_path() -> std::path::PathBuf {
 
 pub(crate) fn read_npmrc() -> Result<Option<NPMRC>> {
     match ini::Ini::load_from_file(npmrc_path()) {
-        Ok(npmrc_ini) => {
-            let props = npmrc_ini.general_section();
-            let kvs = props
-                .iter()
-                .map(|(k, v)| (k.to_string(), v.to_string()))
-                .collect::<Vec<(String, String)>>();
+        Ok(npmrc_ini) => match npmrc_ini.section(None::<String>) {
+            Some(props) => {
+                let kvs = props
+                    .iter()
+                    .map(|(k, v)| (k.to_string(), v.to_string()))
+                    .collect::<Vec<(String, String)>>();
 
-            Ok(Some(kvs))
-        }
+                Ok(Some(kvs))
+            }
+            None => Ok(None),
+        },
         Err(ini::Error::Io(err)) if err.kind() == std::io::ErrorKind::NotFound => Ok(None),
         Err(err) => {
             bail!(err)
         }
+    }
+}
+
+pub(crate) fn read_npmrc_prop<S: AsRef<str>>(prop: S) -> Option<String> {
+    match read_npmrc() {
+        Ok(Some(npmrc)) => npmrc
+            .into_iter()
+            .find(|(k, _)| &k[..] == prop.as_ref())
+            .map(|(_, v)| v),
+        _ => None,
     }
 }
 
@@ -86,19 +98,16 @@ pub(crate) fn write_nrmrc(registries: &[NpmRegistry]) {
 }
 
 pub(crate) fn set_in_use(mut registries: Vec<NpmRegistry>) -> Vec<NpmRegistry> {
-    let mut set = false;
-    if let Ok(npmrc) = ini::Ini::load_from_file(npmrc_path()) {
-        if let Some(global_section) = npmrc.section(None::<String>) {
-            if let Some(registry) = global_section.get(NPMRC_URL) {
-                if let Some(target) = registries.iter_mut().find(|x| x.url == registry) {
-                    target.in_use = true;
-                    set = true;
-                }
-            }
+    let mut has_url_in_npmrc = false;
+
+    if let Some(url) = read_npmrc_prop(NPMRC_URL) {
+        has_url_in_npmrc = true;
+        if let Some(target) = registries.iter_mut().find(|x| x.url[..] == url[..]) {
+            target.in_use = true;
         }
     }
 
-    if !set {
+    if !has_url_in_npmrc {
         if let Some(npm) = registries.iter_mut().find(|x| x.name == "npm") {
             npm.in_use = true;
         }

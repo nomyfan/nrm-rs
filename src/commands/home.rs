@@ -1,25 +1,38 @@
-use crate::utils::get_all_registries;
+use crate::config::NPMRC_HOME;
+use crate::utils::{get_all_registries, read_npmrc_prop};
 
-pub(crate) fn cmd_home(name: String, browser: Option<String>) {
+fn open_in_browser<S: AsRef<str>>(home: S, browser: Option<String>) {
+    if let Err(error) = match browser {
+        Some(browser) => open::with(home.as_ref(), browser),
+        None => open::that(home.as_ref()),
+    } {
+        eprintln!("Failed to open homepage because of `{:?}`", error);
+    }
+}
+
+pub(crate) fn cmd_home(name: Option<String>, browser: Option<String>) {
     let registries = get_all_registries();
 
-    match registries.iter().find(|x| x.name[..] == name[..]) {
-        None => {
-            eprintln!("No registry named \"{}\" found.", &name[..]);
-            std::process::exit(1);
-        }
+    match match name {
+        Some(name) => registries.into_iter().find(|x| x.name[..] == name[..]),
+        None => registries.into_iter().find(|x| x.in_use),
+    } {
         Some(registry) => match &registry.home {
             None => {
-                eprintln!("Registry \"{}\" has no homepage.", &name[..]);
+                eprintln!("Registry \"{}\" has no homepage.", &registry.name[..]);
                 std::process::exit(1);
             }
             Some(home) => {
-                if let Err(error) = match browser {
-                    Some(browser) => open::with(home, browser),
-                    None => open::that(home),
-                } {
-                    eprintln!("Failed to open homepage because of `{:?}`", error);
-                }
+                open_in_browser(home, browser);
+            }
+        },
+        None => match read_npmrc_prop(NPMRC_HOME) {
+            Some(home) => {
+                open_in_browser(home, browser);
+            }
+            _ => {
+                eprintln!("No homepage found.");
+                std::process::exit(1);
             }
         },
     }
