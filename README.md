@@ -5,9 +5,9 @@ Commands under TODO
 - [x] list
 - [x] show
 - [x] use
-- [ ] add
+- [x] add
   - [x] add new
-  - [ ] update existed
+  - [x] update existed
 - [x] rename
 - [x] delete
 - [ ] home
