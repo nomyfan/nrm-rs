@@ -6,15 +6,11 @@ use crate::{
 pub(crate) fn cmd_add(name: String, url: String, home: Option<String>) {
     let mut registries = get_all_registries();
 
-    let normalized_url = if url.ends_with("/") {
-        url
-    } else {
-        url + &"/".to_string()
-    };
+    let normalized_url = if url.ends_with('/') { url } else { url + "/" };
 
-    if let Some(_) = registries
+    if registries
         .iter()
-        .find(|x| x.name == name || x.url == normalized_url)
+        .any(|x| x.name == name || x.url == normalized_url)
     {
         eprintln!("The registry name or url is already included in the nrm registries. Please make sure that the name and url are unique.");
         std::process::exit(1);

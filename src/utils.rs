@@ -65,7 +65,7 @@ pub(crate) fn read_nrmrc() -> Vec<NpmRegistry> {
     registries
 }
 
-pub(crate) fn write_nrmrc(registries: &Vec<NpmRegistry>) {
+pub(crate) fn write_nrmrc(registries: &[NpmRegistry]) {
     let mut nrmrc_ini = ini::Ini::new();
     for registry in registries.iter() {
         let name = &registry.name[..];
@@ -90,7 +90,7 @@ pub(crate) fn set_in_use(mut registries: Vec<NpmRegistry>) -> Vec<NpmRegistry> {
     if let Ok(npmrc) = ini::Ini::load_from_file(npmrc_path()) {
         if let Some(global_section) = npmrc.section(None::<String>) {
             if let Some(registry) = global_section.get(NPMRC_URL) {
-                if let Some(target) = registries.iter_mut().find(|x| &x.url == registry) {
+                if let Some(target) = registries.iter_mut().find(|x| x.url == registry) {
                     target.in_use = true;
                     set = true;
                 }

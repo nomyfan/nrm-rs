@@ -1,10 +1,9 @@
 use crate::utils::get_all_registries;
-use open;
 
 pub(crate) fn cmd_home(name: String, browser: Option<String>) {
     let registries = get_all_registries();
 
-    match registries.iter().find(|x| &x.name[..] == &name[..]) {
+    match registries.iter().find(|x| x.name[..] == name[..]) {
         None => {
             eprintln!("No registry named \"{}\" found.", &name[..]);
             std::process::exit(1);

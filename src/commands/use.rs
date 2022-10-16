@@ -8,7 +8,7 @@ use crate::{
 pub(crate) fn cmd_use(name: String) -> anyhow::Result<()> {
     let registries = get_all_registries();
 
-    match registries.into_iter().find(|x| &x.name[..] == &name[..]) {
+    match registries.into_iter().find(|x| x.name[..] == name[..]) {
         None => {
             eprintln!("No registry named \"{}\" found.", &name);
             std::process::exit(1);
@@ -20,7 +20,7 @@ pub(crate) fn cmd_use(name: String) -> anyhow::Result<()> {
                 Some(npmrc) => {
                     let mut npmrc_pending = npmrc
                         .into_iter()
-                        .filter(|(kx, _)| !new_npmrc.iter().any(|(ky, _)| &ky[..] == &kx[..]))
+                        .filter(|(kx, _)| !new_npmrc.iter().any(|(ky, _)| ky[..] == kx[..]))
                         .collect::<NPMRC>();
                     new_npmrc.append(&mut npmrc_pending);
 
