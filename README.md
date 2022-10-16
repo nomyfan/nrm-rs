@@ -3,13 +3,13 @@
 Commands under TODO
 
 - [x] list
-- [x] current
+- [x] show
 - [x] use
 - [x] add
 - [ ] set
 - [x] rename
 - [x] delete
-- [ ] home
+- [x] home
 
 Commands under consideration
 

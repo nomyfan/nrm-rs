@@ -4,7 +4,7 @@ mod config;
 mod utils;
 
 use cli::{Cli, Command};
-use commands::{add, current, delete, home, list, r#use, rename};
+use commands::{add, delete, home, list, r#use, rename, show};
 
 fn main() {
     use clap::Parser;
@@ -13,8 +13,8 @@ fn main() {
         Command::List => {
             list();
         }
-        Command::Current => {
-            current();
+        Command::Show { name } => {
+            show(name);
         }
         Command::Add {
             name,
