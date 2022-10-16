@@ -1,6 +1,6 @@
 use crate::{
-    config::{get_preset_registries, NpmRegistry},
-    utils::{get_all_registries, write_nrmrc},
+    config::{get_preset_registries, NpmRegistry, NPMRC_HOME, NPMRC_URL},
+    utils::{get_all_registries, read_npmrc, write_npmrc, write_nrmrc},
 };
 
 pub(crate) fn cmd_delete(name: String) {
@@ -22,7 +22,14 @@ pub(crate) fn cmd_delete(name: String) {
             let in_use = registries[nth].in_use;
             registries.remove(nth);
             if in_use {
-                todo!("use npm");
+                if let Ok(Some(npmrc)) = read_npmrc() {
+                    write_npmrc(
+                        npmrc
+                            .into_iter()
+                            .filter(|(k, _)| k[..] != NPMRC_URL[..] && k[..] != NPMRC_HOME[..])
+                            .collect(),
+                    );
+                }
             }
 
             write_nrmrc(&registries);
