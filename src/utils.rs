@@ -17,14 +17,9 @@ pub(crate) fn nrmrc_path() -> std::path::PathBuf {
 pub(crate) fn read_npmrc() -> Result<Option<NPMRC>> {
     match ini::Ini::load_from_file(npmrc_path()) {
         Ok(npmrc_ini) => match npmrc_ini.section(None::<String>) {
-            Some(props) => {
-                let kvs = props
-                    .iter()
-                    .map(|(k, v)| (k.to_string(), v.to_string()))
-                    .collect::<Vec<(String, String)>>();
-
-                Ok(Some(kvs))
-            }
+            Some(props) => Ok(Some(NPMRC::from_into_iter(
+                props.iter().map(|(k, v)| (k.to_string(), v.to_string())),
+            ))),
             None => Ok(None),
         },
         Err(ini::Error::Io(err)) if err.kind() == std::io::ErrorKind::NotFound => Ok(None),
@@ -81,20 +76,16 @@ pub(crate) fn read_nrmrc() -> Vec<NpmRegistry> {
     }
 }
 
-pub(crate) fn write_nrmrc(registries: &[NpmRegistry]) {
+pub(crate) fn write_nrmrc(registries: Vec<NpmRegistry>) {
     let mut nrmrc_ini = ini::Ini::new();
-    for registry in registries.iter() {
-        let name = &registry.name[..];
-        let mut section = nrmrc_ini.with_section(Some(name));
-        let mut section = section.set(NPMRC_URL, &registry.url[..]);
-        if let Some(home) = &registry.home {
-            section = section.set(NPMRC_HOME, &home[..]);
-        }
 
-        if registry.kvs.is_some() {
-            for (k, v) in registry.kvs.as_ref().unwrap().iter() {
-                section = section.set(&k[..], &v[..]);
-            }
+    for registry in registries.into_iter() {
+        let name = &registry.name[..];
+        let mut section = &mut nrmrc_ini.with_section(Some(name));
+
+        let npmrc: NPMRC = registry.into();
+        for (key, value) in npmrc {
+            section = section.set(key, value);
         }
     }
 

@@ -1,9 +1,6 @@
 use anyhow::Ok;
 
-use crate::{
-    config::NPMRC,
-    utils::{get_all_registries, read_npmrc, write_npmrc},
-};
+use crate::utils::{get_all_registries, read_npmrc, write_npmrc};
 
 pub(crate) fn cmd_use(name: String) -> anyhow::Result<()> {
     let registries = get_all_registries();
@@ -13,25 +10,18 @@ pub(crate) fn cmd_use(name: String) -> anyhow::Result<()> {
             eprintln!("No registry named \"{}\" found.", &name);
             std::process::exit(1);
         }
-        Some(registry) => {
-            let mut new_npmrc: NPMRC = registry.into();
+        Some(registry) => match read_npmrc()? {
+            Some(npmrc) => {
+                let mut new_npmrc = npmrc;
+                new_npmrc.append(&mut registry.into());
 
-            match read_npmrc()? {
-                Some(npmrc) => {
-                    let mut npmrc_pending = npmrc
-                        .into_iter()
-                        .filter(|(kx, _)| !new_npmrc.iter().any(|(ky, _)| ky[..] == kx[..]))
-                        .collect::<NPMRC>();
-                    new_npmrc.append(&mut npmrc_pending);
-
-                    write_npmrc(new_npmrc);
-                    Ok(())
-                }
-                None => {
-                    write_npmrc(new_npmrc);
-                    Ok(())
-                }
+                write_npmrc(new_npmrc);
+                Ok(())
             }
-        }
+            None => {
+                write_npmrc(registry.into());
+                Ok(())
+            }
+        },
     }
 }

@@ -1,5 +1,5 @@
 use crate::{
-    config::{get_preset_registries, NpmRegistry, NPMRC_HOME, NPMRC_URL},
+    config::{get_preset_registries, NpmRegistry, NPMRC, NPMRC_HOME, NPMRC_URL},
     utils::{get_all_registries, read_npmrc, write_npmrc, write_nrmrc},
 };
 
@@ -23,16 +23,15 @@ pub(crate) fn cmd_delete(name: String) {
             registries.remove(nth);
             if in_use {
                 if let Ok(Some(npmrc)) = read_npmrc() {
-                    write_npmrc(
+                    write_npmrc(NPMRC::from_into_iter(
                         npmrc
                             .into_iter()
-                            .filter(|(k, _)| k[..] != NPMRC_URL[..] && k[..] != NPMRC_HOME[..])
-                            .collect(),
-                    );
+                            .filter(|(k, _)| k[..] != NPMRC_URL[..] && k[..] != NPMRC_HOME[..]),
+                    ));
                 }
             }
 
-            write_nrmrc(&registries);
+            write_nrmrc(registries);
         }
     }
 }

@@ -25,5 +25,5 @@ pub(crate) fn cmd_add(name: String, url: String, home: Option<String>) {
         }
     };
 
-    write_nrmrc(&registries);
+    write_nrmrc(registries);
 }

@@ -20,7 +20,7 @@ pub(crate) fn cmd_rename(name: String, new_name: String) {
         Some(nth) => {
             let element = &mut registries[nth];
             element.name = new_name;
-            write_nrmrc(&registries);
+            write_nrmrc(registries);
         }
     };
 }
