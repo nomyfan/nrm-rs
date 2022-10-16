@@ -4,7 +4,7 @@ mod config;
 mod utils;
 
 use cli::{Cli, Command};
-use commands::{add, current, delete, list, r#use, rename};
+use commands::{add, current, delete, home, list, r#use, rename};
 
 fn main() {
     use clap::Parser;
@@ -31,6 +31,9 @@ fn main() {
         }
         Command::Use { name } => {
             r#use(name).unwrap();
+        }
+        Command::Home { name, browser } => {
+            home(name, browser);
         }
     }
 }

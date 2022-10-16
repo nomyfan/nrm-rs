@@ -26,4 +26,8 @@ pub(crate) enum Command {
     Use {
         name: String,
     },
+    Home {
+        name: String,
+        browser: Option<String>,
+    },
 }
