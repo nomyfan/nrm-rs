@@ -4,7 +4,7 @@ use clap::{Parser, Subcommand};
 #[clap(author)]
 pub(crate) struct Cli {
     #[clap(subcommand)]
-    pub(crate) command: Command,
+    pub(crate) command: Option<Command>,
 }
 
 #[derive(Subcommand, Debug)]
