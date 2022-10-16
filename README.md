@@ -5,16 +5,15 @@ Commands under TODO
 - [x] list
 - [x] show
 - [x] use
-- [x] add
-- [ ] set
+- [ ] add
+  - [x] add new
+  - [ ] update existed
 - [x] rename
 - [x] delete
-- [x] home
-
-Commands under consideration
-
-- [ ] login
-- [ ] set-hosted-repo
+- [ ] home
+  - [x] open homepage with registry name in .nrmrc
+  - [ ] open currently used registry's homepage(without `name` provided)
+    - [ ] find in .nrmrc
+    - [ ] find `home` property in .npmrc
 - [ ] set-scope
 - [ ] del-scope
-- [ ] publish
