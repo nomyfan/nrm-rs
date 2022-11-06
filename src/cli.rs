@@ -12,10 +12,7 @@ pub(crate) enum Command {
     #[clap(about = "List all registries")]
     List,
     #[clap(about = "Show registry detail")]
-    Show {
-        #[clap(short = 'n', long = "name")]
-        name: Option<String>,
-    },
+    Show { name: Option<String> },
     #[clap(about = "Add or update a registry")]
     Add {
         #[clap(help = "Registry name")]

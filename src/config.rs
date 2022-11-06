@@ -2,6 +2,9 @@ use std::vec::IntoIter;
 
 pub(crate) const NPMRC_HOME: &str = "home";
 pub(crate) const NPMRC_URL: &str = "registry";
+/// `npm config get` returns `undefined` if the property
+/// is not present in the config.
+pub(crate) const UNDEFINED: &str = "undefined";
 
 pub(crate) type KV = (String, String);
 pub(crate) struct NPMRC {
