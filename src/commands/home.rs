@@ -1,5 +1,5 @@
-use crate::config::NPMRC_HOME;
-use crate::utils::{get_all_registries, read_npmrc_prop};
+use crate::config::{NPMRC_HOME, UNDEFINED};
+use crate::utils::{get_all_registries, npmrc_get};
 
 fn open_in_browser<S: AsRef<str>>(home: S, browser: Option<String>) {
     if let Err(error) = match browser {
@@ -26,8 +26,8 @@ pub(crate) fn cmd_home(name: Option<String>, browser: Option<String>) {
                 open_in_browser(home, browser);
             }
         },
-        None => match read_npmrc_prop(NPMRC_HOME) {
-            Some(home) => {
+        None => match npmrc_get(NPMRC_HOME) {
+            Some(home) if home != UNDEFINED => {
                 open_in_browser(home, browser);
             }
             _ => {

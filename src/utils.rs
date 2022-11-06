@@ -1,12 +1,6 @@
 use crate::config::{get_preset_registries, NpmRegistry, KV, NPMRC};
-use crate::config::{NPMRC_HOME, NPMRC_URL};
-use anyhow::{bail, Result};
-
-pub(crate) fn npmrc_path() -> std::path::PathBuf {
-    let home_dir = dirs::home_dir().unwrap();
-
-    home_dir.join(".npmrc")
-}
+use crate::config::{NPMRC_HOME, NPMRC_URL, UNDEFINED};
+use xshell::{cmd, Shell};
 
 pub(crate) fn nrmrc_path() -> std::path::PathBuf {
     let home_dir = dirs::home_dir().unwrap();
@@ -14,40 +8,29 @@ pub(crate) fn nrmrc_path() -> std::path::PathBuf {
     home_dir.join(".nrmrc")
 }
 
-pub(crate) fn read_npmrc() -> Result<Option<NPMRC>> {
-    match ini::Ini::load_from_file(npmrc_path()) {
-        Ok(npmrc_ini) => match npmrc_ini.section(None::<String>) {
-            Some(props) => Ok(Some(NPMRC::from_into_iter(
-                props.iter().map(|(k, v)| (k.to_string(), v.to_string())),
-            ))),
-            None => Ok(None),
-        },
-        Err(ini::Error::Io(err)) if err.kind() == std::io::ErrorKind::NotFound => Ok(None),
-        Err(err) => {
-            bail!(err)
-        }
-    }
+pub(crate) fn npmrc_get<S: AsRef<str>>(prop: S) -> Option<String> {
+    let sh = Shell::new().unwrap();
+    let prop = prop.as_ref();
+
+    cmd!(sh, "npm config get {prop}").quiet().read().ok()
 }
 
-pub(crate) fn read_npmrc_prop<S: AsRef<str>>(prop: S) -> Option<String> {
-    match read_npmrc() {
-        Ok(Some(npmrc)) => npmrc
-            .into_iter()
-            .find(|(k, _)| &k[..] == prop.as_ref())
-            .map(|(_, v)| v),
-        _ => None,
-    }
+pub(crate) fn npmrc_delete<S: AsRef<str>>(prop: S) {
+    let sh = Shell::new().unwrap();
+    let prop = prop.as_ref();
+
+    cmd!(sh, "npm config delete {prop}").quiet().run().unwrap();
 }
 
-pub(crate) fn write_npmrc(npmrc: NPMRC) {
-    let mut npmrc_ini = ini::Ini::new();
-    let mut section = &mut npmrc_ini.with_general_section();
+pub(crate) fn npmrc_set<S: AsRef<str>, V: AsRef<str>>(prop: S, value: V) {
+    let sh = Shell::new().unwrap();
+    let prop = prop.as_ref();
+    let value = value.as_ref();
 
-    for (k, v) in npmrc.into_iter() {
-        section = section.set(k, v);
-    }
-
-    npmrc_ini.write_to_file(npmrc_path()).unwrap();
+    cmd!(sh, "npm config set {prop} {value}")
+        .quiet()
+        .run()
+        .unwrap();
 }
 
 pub(crate) fn read_nrmrc() -> Vec<NpmRegistry> {
@@ -95,12 +78,15 @@ pub(crate) fn write_nrmrc(registries: Vec<NpmRegistry>) {
 pub(crate) fn set_in_use(mut registries: Vec<NpmRegistry>) -> Vec<NpmRegistry> {
     let mut has_url_in_npmrc = false;
 
-    if let Some(url) = read_npmrc_prop(NPMRC_URL) {
-        has_url_in_npmrc = true;
-        if let Some(target) = registries.iter_mut().find(|x| x.url[..] == url[..]) {
-            target.in_use = true;
+    match npmrc_get(NPMRC_URL) {
+        Some(url) if &url[..] != UNDEFINED => {
+            has_url_in_npmrc = true;
+            if let Some(target) = registries.iter_mut().find(|x| x.url[..] == url[..]) {
+                target.in_use = true;
+            }
         }
-    }
+        _ => {}
+    };
 
     if !has_url_in_npmrc {
         if let Some(npm) = registries.iter_mut().find(|x| x.name == "npm") {
