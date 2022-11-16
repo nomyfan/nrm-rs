@@ -34,4 +34,12 @@ pub(crate) enum Command {
         #[clap(short = 'b', long = "browser")]
         browser: Option<String>,
     },
+    #[clap(name = "set-scope", about = "Add or update a scope registry")]
+    SetScope {
+        scope: String,
+        #[clap(help = "The name of the registry")]
+        registry: String,
+    },
+    #[clap(name = "del-scope", about = "Delete a scope registry")]
+    DeleteScope { scope: String },
 }
