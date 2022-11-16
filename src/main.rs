@@ -4,7 +4,7 @@ mod config;
 mod utils;
 
 use cli::{Cli, Command};
-use commands::{add, delete, home, list, r#use, rename, show};
+use commands::{add, delete, delete_scope, home, list, r#use, rename, set_scope, show};
 
 fn main() {
     use clap::Parser;
@@ -36,6 +36,12 @@ fn main() {
             }
             Command::Home { name, browser } => {
                 home(name, browser);
+            }
+            Command::SetScope { scope, registry } => {
+                set_scope(scope, registry);
+            }
+            Command::DeleteScope { scope } => {
+                delete_scope(scope);
             }
         },
         None => list(),
